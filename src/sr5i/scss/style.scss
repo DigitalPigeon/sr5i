@@ -1,0 +1,99 @@
+.checkbox input, .checkbox-icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.row-no-border
+{
+  border: 0px;
+
+}
+
+.row-no-side-border
+{
+    border-left: 0px;
+    border-right: 0px;
+
+}
+
+.row-no-bottom-border
+{
+    border-bottom: 0px;    
+
+}
+
+.row-no-top-border
+{
+    border-top: 0px;    
+
+}
+
+.row-no-top-padding{
+    padding-top:0px;
+}
+
+.row-no-bottom-padding{
+    padding-bottom:0px;
+}
+
+/*
+    CSS styles to eliminate the annoying flickering header when changing tabs in an Ionic app on Android:
+    http://forum.ionicframework.com/t/flickering-when-navigating-via-tabs-on-android/27281/2
+
+    note that in the link, the class also contains 
+    .platform-android
+    but this did not work for me. removing it fixed the issue
+
+*/
+.header-item.title {
+    transition-duration: 0ms;
+}
+.header-item.buttons {
+    transition-duration: 0ms;
+}
+
+.col-100 {
+  -webkit-box-flex: 0;
+  -webkit-flex: 0 0 100%;
+  -moz-box-flex: 0;
+  -moz-flex: 0 0 100%;
+  -ms-flex: 0 0 100%;
+  flex: 0 0 100%;
+  max-width: 100%; }
+
+.grid-alternating-row { 
+    background: $light; 
+    color: $dark;
+    padding:0px; 
+
+}
+
+.grid-alternating-row:nth-child(odd) { 
+    background: $stable; 
+    color: $dark;
+    padding:0px; 
+}
+
+.grid-sub-header-row {
+    font-weight: bold;
+    background: $dark;     
+    color: $stable;
+}
+
+.grid-header-row {
+    font-weight: bold;
+    background: $stable;    
+    color: $dark;
+}
+
+span.line {
+  display: inline-block;
+}
+
+.icon-smaller::before {
+    font-size: smaller;
+}
+
+.icon-x-small::before {
+    font-size: x-small;
+}

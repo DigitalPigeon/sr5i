@@ -1,0 +1,12 @@
+<ion-view view-title="{{character.name}} Options">
+  <ion-content class="padding">
+
+    <a class="button button-positive button-full" type="button" ng-click="addInterupt(character, {name: 'Full Defence', initiative:-10})" >Full Defense (-10)</a>     
+    <a class="button button-positive button-full" type="button" ng-click="addInterupt(character, {name: 'Dodge / Parry / Block', initiative:-5})" >Dodge / Parry / Block (-5)</a> 
+    <a class="button button-positive button-full" type="button" ng-click="addInterupt(character, {name: 'Counterspell', initiative:-5})">Counterspell (-5)</a> 
+    <a class="button button-positive button-full" type="button" ng-click="addInterupt(character, {name: 'Other'})">Other (-?)</a> 
+    <hr />
+    <a class="button button-assertive button-full" type="button" ng-click="deleteCharacter(character)" >Delete</a>     
+
+  </ion-content>
+</ion-view>

@@ -1,0 +1,33 @@
+<!--
+  This template loads for the 'tab.friend-detail' state (app.js)
+  'friend' is a $scope variable created in the FriendsCtrl controller (controllers.js)
+  The FriendsCtrl pulls data from the Friends service (service.js)
+  The Friends service returns an array of friend data
+-->
+<ion-view view-title="Shadowrun 5 Intitiative Tracker">
+  <ion-content class="padding">
+    
+      
+      <button class="button button-positive button-full" type="button" >Next Character!</button>     
+      
+      <div class="list" >
+          
+          <div class="item item-icon-right list-divider row-no-top-border row-no-side-border" style="padding-bottom:10px;" ng-click="addCharacter()" >
+              <b>Characters</b>
+              <a >
+                  <i class="icon ion-plus positive icon-smaller"></i>
+              </a>
+          </div>
+          <!--ng-click="showInfoPage(category.infoPageState); $event.stopPropagation();"-->
+
+          <div ng-repeat="character in characters" class="item item-icon-right  row-no-side-border" style="padding-bottom:10px;" ng-click="showCharacterOptions(character)">
+              {{character.name}} ({{character.initiative || '-'}})
+              <a >
+                  <i class="icon ion-more icon-smaller"></i>
+              </a>
+          </div>
+
+      </div>
+
+  </ion-content>
+</ion-view>
