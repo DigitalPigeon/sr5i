@@ -8,12 +8,14 @@
   <ion-content class="padding">
     
       
-      <button class="button button-positive button-full" type="button" >Next Character!</button>     
+      <button class="button button-positive button-full" type="button" ng-click="activeCharacterTakesPass()" ng-if="actingCharacter() != null">Next!</button>     
+      
+      <button class="button button-balanced button-full" type="button" ng-click="rollInitiative()" ng-if="actingCharacter() == null" >Roll Initiative!</button>     
       
       <div class="list" >
           
           <div class="item item-icon-right list-divider row-no-top-border row-no-side-border" style="padding-bottom:10px;" ng-click="addCharacter()" >
-              <b>Characters</b>
+              <b>Initiative Order</b>
               <a >
                   <i class="icon ion-plus positive icon-smaller"></i>
               </a>
@@ -21,7 +23,7 @@
           <!--ng-click="showInfoPage(category.infoPageState); $event.stopPropagation();"-->
 
           <div ng-repeat="character in characters" class="item item-icon-right  row-no-side-border" style="padding-bottom:10px;" ng-click="showCharacterOptions(character)">
-              {{character.name}} ({{character.initiative || '-'}})
+              {{character.name}} ({{character.initiative || '-'}}, Pass {{character.pass}})
               <a >
                   <i class="icon ion-more icon-smaller"></i>
               </a>

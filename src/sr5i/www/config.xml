@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<widget xmlns="http://www.w3.org/ns/widgets" 
+        xmlns:gap="http://phonegap.com/ns/1.0"
+        id="com.irlinnovations.shadowruncombatcalc" 
+        version="0.1.0" >
+  
+    <name>SR5 Initiative Tracker</name>
+    
+    <description>
+        Initiative Tracker for SR5
+    </description>
+    
+    <author email="chris.friedel@gmail.com" href="http://www.irlinnovations.com">
+      Chris Friedel
+    </author>
+    
+    <content src="index.html" />
+  
+    <access origin="*" />
+  
+    <preference name="webviewbounce" value="false" />
+    <preference name="UIWebViewBounce" value="false" />
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="android-minSdkVersion" value="16" />
+    <preference name="BackupWebStorage" value="none" />
+    
+    <feature name="StatusBar">
+        <param name="ios-package" onload="true" value="CDVStatusBar" />
+    </feature>
+    
+    <engine name="android" spec="~4.1.1" />
+
+  <icon src="icon.png" />
+  
+  <gap:platform name="android" />
+  <!--
+    <gap:platform name="ios" />
+    <gap:platform name="webos" />
+    <gap:platform name="symbian" />
+    <gap:platform name="blackberry" />
+    <gap:platform name="winphone" />
+  -->
+  
+</widget>

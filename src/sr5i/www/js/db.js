@@ -38,7 +38,7 @@ angular.module('starter.db', [])
         },
 
         select: function (table, key) {
-            console.log('select ' + key + ' @ ' + table);
+            //console.log('select ' + key + ' @ ' + table);
 
             if (key) {
                 return retrieveJson(table, key);
@@ -57,19 +57,19 @@ angular.module('starter.db', [])
 
         },
         insert: function (table, key, object) {
-            console.log('insert ' + key + ' @ ' + table + ' with ' + JSON.stringify(object));
+            //console.log('insert ' + key + ' @ ' + table + ' with ' + JSON.stringify(object));
             $window.localStorage[createKey(table, key)] = JSON.stringify(object);
             return object;
         },
 
         update: function (table, key, object) {
-            console.log('update ' + key + ' @ ' + table + ' to ' + JSON.stringify(object));
+            //console.log('update ' + key + ' @ ' + table + ' to ' + JSON.stringify(object));
             $window.localStorage[createKey(table, key)] = JSON.stringify(object);
             return;
         },
 
         del: function (table, key) {
-            console.log('delete ' + key + ' @ ' + table);
+            //console.log('delete ' + key + ' @ ' + table);
             $window.localStorage.removeItem(createKey(table, key));
             return;
         },

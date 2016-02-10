@@ -1,46 +1,108 @@
 angular.module('starter.controllers', [])
 
 
-    .controller('AppController', function ($rootScope, $scope, $state, $ionicPopup, domain$Character) {
+    .controller('AppController', function ($rootScope, $scope, $state, $q, $ionicPopup, db, domain$Character, initiativeManagerService) {
 
-            var characterOptionsPopup;
 
-            $scope.addCharacter = function() {
-                $ionicPopup.prompt({title:'Character Name'})
-                    .then(function(result) {
+        $scope.activeCharacterTakesPass = function () {
+            var actingCharacter = $scope.actingCharacter();
+            initiativeManagerService.takePass(actingCharacter);
+            domain$Character.persist(actingCharacter);
+            $scope.reloadHome();
+        };
+
+        $scope.actingCharacter = function() {
+            return initiativeManagerService.actingCharacter(domain$Character.retrieveAll());
+        }
+
+        $scope.reloadHome = function() {
+            $state.go('app.tracker', null, { reload: true });    
+        };
+
+        $scope.clearEverything = function() {
+            $ionicPopup.confirm({ title: 'Clear everything?', subTitle: 'This cannot be undone.' })
+                .then(function (result) {
                     if (result) {
-                        domain$Character.persist({name: result, initiative: null});
+                        db.reset();
+                        $scope.reloadHome();    
                     }
                 });
-            };
+        };
 
-            $scope.showCharacterOptions = function (character) {
-                $state.go('app.characterOptions', {characterId: character.id});
+        $scope.addCharacter = function() {
+            $ionicPopup.prompt({title:'Name'})
+                .then(function(result) {
+                if (result) {
+                    domain$Character.persist({ name: result, initiative: null, pass:1 });
+                    $scope.reloadHome();
+                }
+            });
+        };
+
+        $scope.showCharacterOptions = function (character) {
+            $state.go('app.characterOptions', {characterId: character.id});
+        };
+
+        $scope.rollInitiative = function () {
+            var characters = domain$Character.retrieveAll();
+
+            var rollAll = function() {
+
+                var deferred = $q.defer();
+                var rolledCount = 0;
+
+                angular.forEach(characters, function(character) {
+
+                    $ionicPopup.prompt({ title: character.name + "'s" + ' initiative?' })
+                        .then(function (result) {
+                            deferred.notify(character.name);
+                            if (result) {
+                                initiativeManagerService.setNew(character, result);
+                                domain$Character.persist(character);
+                            }
+
+                            rolledCount++;
+                        if (rolledCount == characters.length) {
+                            deferred.resolve(rolledCount);
+                        }
+                    });
+
+                });
+                
+                return deferred.promise;
             };
             
-        })
+            rollAll()
+            .then(function(result) {
+                $scope.reloadHome();  
+            });
+            
+        };
+            
+    })
 
-    .controller('TrackerController', function ($scope, domain$Character) {
-
-    
+    .controller('TrackerController', function ($scope, domain$Character, initiativeManagerService) {
 
         $scope.$on('$ionicView.enter', function() {
-                $scope.characters = domain$Character.retrieveAll();
+            $scope.characters = initiativeManagerService.charactersInActionOrder(domain$Character.retrieveAll());
+
+            angular.forEach($scope.characters, function (character) {
+
+                //console.log('tracker for ' + character.name + ": " + character.initiative);
+
+            });
+
         });
 
     })
 
-    .controller('CharacterOptionsController', function ($rootScope, $scope, $stateParams, $ionicPopup, domain$Character) {
+    .controller('CharacterOptionsController', function ($rootScope, $scope, $stateParams, $ionicPopup, domain$Character, initiativeManagerService) {
 
         $scope.character = domain$Character.retrieve($stateParams.characterId);
-
-        console.log($scope.character);
-        
-        console.log($scope.character.name);
         
         $scope.deleteCharacter = function (character) {
 
-            $ionicPopup.confirm({ title: 'Delete ' + character.name + '?' })
+            $ionicPopup.confirm({ title: 'Delete ' + character.name + '?', subTitle: 'This cannot be undone.' })
                     .then(function (result) {
                         if (result) {
                             domain$Character.del(character.id);
@@ -50,17 +112,15 @@ angular.module('starter.controllers', [])
 
         };
 
-            $scope.addInterupt = function (character, interupt) {
+        $scope.addInterupt = function (character, interupt) {
 
-            character.initiative += interupt.initiative;
+            initiativeManagerService.applyInterupt(character, interupt);
             domain$Character.persist(character);
-            
             $rootScope.$ionicGoBack();
-
         };
            
 
-        })
+    })
 
         
 

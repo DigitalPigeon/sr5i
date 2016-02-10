@@ -45,7 +45,7 @@ angular.module('starter.domain', [])
 
     var table = 'character';
     
-    var columns = ['name', 'initiative'];
+    var columns = ['name', 'initiative', 'pass'];
 
     return domain(db, table, columns);
 
