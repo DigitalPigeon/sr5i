@@ -3,6 +3,9 @@ angular.module('starter.controllers', [])
 
     .controller('AppController', function ($rootScope, $scope, $state, $q, $ionicPopup, db, domain$Character, initiativeManagerService) {
 
+        $scope.goBack = function() {
+            $rootScope.$ionicGoBack();        
+        };
 
         $scope.activeCharacterTakesPass = function () {
             var actingCharacter = $scope.actingCharacter();
@@ -29,14 +32,8 @@ angular.module('starter.controllers', [])
                 });
         };
 
-        $scope.addCharacter = function() {
-            $ionicPopup.prompt({title:'Name'})
-                .then(function(result) {
-                if (result) {
-                    domain$Character.persist({ name: result, initiative: null, pass:1 });
-                    $scope.reloadHome();
-                }
-            });
+        $scope.addCharacter = function () {
+            $state.go('app.addCharacter');
         };
 
         $scope.showCharacterOptions = function (character) {
@@ -92,7 +89,7 @@ angular.module('starter.controllers', [])
 
             });
 
-        });
+        }); 
 
     })
 
@@ -122,6 +119,21 @@ angular.module('starter.controllers', [])
 
     })
 
+
+    .controller('AddCharacterController', function ($scope, domain$Character) {
+
+        $scope.$on('$ionicView.enter', function () {
+            $scope.character = { name: '', initiative: '', eventThisPass: false, eventNextPass: false };
+            console.log($scope.character);
+        });
+
+        $scope.create = function() {
+            console.log($scope.character);
+            domain$Character.persist({ name: $scope.character.name, initiative: $scope.character.initiative, pass: 1 });
+            $scope.reloadHome();
+        }
+
+    })
         
 
 ;
