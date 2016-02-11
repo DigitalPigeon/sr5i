@@ -1,7 +1,7 @@
 angular.module('starter.controllers', [])
 
 
-    .controller('AppController', function ($rootScope, $scope, $state, $q, $ionicPopup, db, domain$Character, initiativeManagerService) {
+    .controller('AppController', function ($rootScope, $scope, $state, $q, $ionicPopup, $ionicHistory, db, domain$Character, initiativeManagerService) {
 
         $scope.goBack = function() {
             $rootScope.$ionicGoBack();        
@@ -9,9 +9,18 @@ angular.module('starter.controllers', [])
 
         $scope.activeCharacterTakesPass = function () {
             var actingCharacter = $scope.actingCharacter();
-            initiativeManagerService.takePass(actingCharacter);
-            domain$Character.persist(actingCharacter);
-            $scope.reloadHome();
+
+            if (actingCharacter.isEvent) {
+                $ionicPopup.alert({ title: actingCharacter.name + ' Occurs!', subTitle: 'This event is now complete.' })
+                    .then(function() {
+                        domain$Character.del(actingCharacter.id);
+                        $scope.reloadHome();
+                    });
+            } else {
+                    initiativeManagerService.takePass(actingCharacter);
+                    domain$Character.persist(actingCharacter);
+                    $scope.reloadHome();    
+            }
         };
 
         $scope.actingCharacter = function() {
@@ -19,6 +28,11 @@ angular.module('starter.controllers', [])
         }
 
         $scope.reloadHome = function() {
+
+            $ionicHistory.nextViewOptions({
+                disableBack: true
+            });
+            
             $state.go('app.tracker', null, { reload: true });    
         };
 
@@ -40,7 +54,7 @@ angular.module('starter.controllers', [])
             $state.go('app.characterOptions', {characterId: character.id});
         };
 
-        $scope.rollInitiative = function () {
+        $scope.rollInitiative = function (isNewCombat) {
             var characters = domain$Character.retrieveAll();
 
             var rollAll = function() {
@@ -50,20 +64,27 @@ angular.module('starter.controllers', [])
 
                 angular.forEach(characters, function(character) {
 
-                    $ionicPopup.prompt({ title: character.name + "'s" + ' initiative?' })
-                        .then(function (result) {
-                            deferred.notify(character.name);
-                            if (result) {
-                                initiativeManagerService.setNew(character, result);
-                                domain$Character.persist(character);
-                            }
+                    if (!character.isEvent) {
+                        $ionicPopup.prompt({ title: character.name + "'s" + ' initiative?' })
+                            .then(function(result) {
+                                deferred.notify(character.name);
+                                if (result) {
+                                    initiativeManagerService.takeTurn(character, result, isNewCombat);
+                                    domain$Character.persist(character);
+                                }
 
+                                rolledCount++;
+                                if (rolledCount == characters.length) {
+                                    deferred.resolve(rolledCount);
+                                }
+                            });
+                    } else {
+                            //we still need to count the event as rolled
                             rolledCount++;
-                        if (rolledCount == characters.length) {
-                            deferred.resolve(rolledCount);
-                        }
-                    });
-
+                            if (rolledCount == characters.length) {
+                                deferred.resolve(rolledCount);
+                            }
+                    }
                 });
                 
                 return deferred.promise;
@@ -85,7 +106,7 @@ angular.module('starter.controllers', [])
 
             angular.forEach($scope.characters, function (character) {
 
-                //console.log('tracker for ' + character.name + ": " + character.initiative);
+                console.log(character);
 
             });
 
@@ -93,9 +114,12 @@ angular.module('starter.controllers', [])
 
     })
 
-    .controller('CharacterOptionsController', function ($rootScope, $scope, $stateParams, $ionicPopup, domain$Character, initiativeManagerService) {
+    .controller('CharacterOptionsController', function ($rootScope, $scope, $state, $stateParams, $ionicPopup, domain$Character, initiativeManagerService) {
 
-        $scope.character = domain$Character.retrieve($stateParams.characterId);
+
+        $scope.$on('$ionicView.beforeEnter', function() {
+            $scope.character = domain$Character.retrieve($stateParams.characterId);
+        });
         
         $scope.deleteCharacter = function (character) {
 
@@ -109,6 +133,11 @@ angular.module('starter.controllers', [])
 
         };
 
+        $scope.editCharacter = function(character) {
+            $state.go('app.editCharacter', {characterId: character.id});
+        };
+
+
         $scope.addInterupt = function (character, interupt) {
 
             initiativeManagerService.applyInterupt(character, interupt);
@@ -120,16 +149,53 @@ angular.module('starter.controllers', [])
     })
 
 
-    .controller('AddCharacterController', function ($scope, domain$Character) {
+    .controller('AddCharacterController', function ($scope, domain$Character, initiativeManagerService  ) {
 
         $scope.$on('$ionicView.enter', function () {
             $scope.character = { name: '', initiative: '', eventThisPass: false, eventNextPass: false };
-            console.log($scope.character);
+
+            $scope.currentInitiative = initiativeManagerService.currentInitiative();
+            $scope.currentPass = initiativeManagerService.currentPass();
+            $scope.currentTurn = initiativeManagerService.currentTurn();
+
         });
 
-        $scope.create = function() {
-            console.log($scope.character);
-            domain$Character.persist({ name: $scope.character.name, initiative: $scope.character.initiative, pass: 1 });
+        $scope.create = function (eventOffset) {
+
+            //if scheduled for next turn, then it will occur on the first pass of that turn
+            var currentPass = $scope.currentPass;
+            var currentTurn = $scope.currentTurn;
+
+            var triggeringTurn = !eventOffset ? currentTurn : (currentTurn + eventOffset.turn);
+            var triggeringPass = !eventOffset ? currentPass : (currentPass + eventOffset.pass);
+
+            //special case, if the triggering turn is in the future, then that pass must be 1st (since its a new turn)
+            if (eventOffset && eventOffset.turn > 0) {
+                triggeringPass = 1;
+            }
+
+            domain$Character.persist({ name: $scope.character.name, 
+                                        initiative: $scope.character.initiative, pass: triggeringPass, turn: triggeringTurn,
+                                        isEvent: eventOffset != undefined,
+                                        effects: []
+                                    });
+            $scope.reloadHome();
+
+        }
+
+    })
+
+
+    .controller('EditCharacterController', function ($scope, $stateParams, domain$Character, initiativeManagerService) {
+
+        $scope.$on('$ionicView.enter', function () {
+
+            var characterId = $stateParams.characterId;
+            $scope.character = domain$Character.retrieve(characterId);
+        });
+
+        $scope.update = function (character) {
+            domain$Character.persist(character);
             $scope.reloadHome();
         }
 

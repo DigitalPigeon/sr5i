@@ -4,7 +4,7 @@
   The FriendsCtrl pulls data from the Friends service (service.js)
   The Friends service returns an array of friend data
 -->
-<ion-view view-title="SR5 Intitiative Tracker">
+<ion-view view-title="SR5 Intitiative Tracker" disable-back-button="true">
   <ion-content class="padding">
     
       
@@ -23,7 +23,11 @@
           <!--ng-click="showInfoPage(category.infoPageState); $event.stopPropagation();"-->
 
           <div ng-repeat="character in characters" class="item item-icon-right  row-no-side-border" style="padding-bottom:10px;" ng-click="showCharacterOptions(character)">
-              {{character.name}} ({{character.initiative || '-'}}, Pass {{character.pass}})
+              {{character.name}} <small>({{character.initiative || '-'}}, Pass {{character.pass}}, Turn: {{character.turn}}) </small>              
+              <div ng-repeat="effect in character.effects" style="font-size: x-small; font-style: italic;">
+                  {{effect}}
+              </div>
+
               <a >
                   <i class="icon ion-more icon-smaller"></i>
               </a>

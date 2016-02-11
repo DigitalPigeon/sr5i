@@ -70,6 +70,16 @@ angular.module('starter', ['ionic', 'starter.db', 'starter.domain', 'starter.con
                 }
             }
         })
+
+        .state('app.editCharacter', {
+            url: '/editCharacter/:characterId',
+            views: {
+                'main': {
+                    templateUrl: 'templates/editCharacter.html',
+                    controller: 'EditCharacterController'
+                }
+            }
+        })
         
         ;
 

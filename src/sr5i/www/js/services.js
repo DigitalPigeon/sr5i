@@ -1,47 +1,109 @@
 angular.module('starter.services', [])
 
-.factory('initiativeManagerService', [function() {
+.factory('initiativeManagerService', ['domain$Character', function (domain$Character) {
   return {
     
-    setNew: function(character, newInitiativeScore) {
-        character.initiative = parseInt(newInitiativeScore);
-        character.pass = 1;
-      return character;
-  },
-
   actingCharacter: function(characters) {
-      if (this.charactersInActionOrder(characters)[0].initiative > 0) {
+      
+      characters = characters || domain$Character.retrieveAll();
+      characters = this.charactersInActionOrder(characters);
+      if (characters.length > 0 && characters[0].initiative > 0) {
           return this.charactersInActionOrder(characters)[0];
       }
       return null;
   },
 
+  currentInitiative: function (characters) {
+
+      characters = characters || domain$Character.retrieveAll();
+      characters = this.charactersInActionOrder(characters);
+
+      if (characters.length > 0) {
+          return characters[0].initiative;
+      } else {
+          return 0;
+      }
+  },
+
+  currentPass: function (characters) {
+
+      characters = characters || domain$Character.retrieveAll();
+      characters = this.charactersInActionOrder(characters);
+
+      if (characters.length > 0) {
+          return characters[0].pass;
+      } else {
+          return 1;
+      }
+  },
+
+  currentTurn: function (characters) {
+
+      characters = characters || domain$Character.retrieveAll();
+      characters = this.charactersInActionOrder(characters);
+
+      if (characters.length > 0) {
+          return characters[0].turn;
+      } else {
+          return 1;
+      }
+  },
+
   charactersInActionOrder: function(characters) {
 
+      characters = characters || domain$Character.retrieveAll();
+
       characters.sort(function(a, b) {
+
+          //first order by turn, future turns MUST be last
+          if (a.turn > b.turn) { return 1; }
+          if (a.turn < b.turn) { return -1; }
           
-          var passOrder = (a.pass - b.pass) * 1000; //lowest pass first
-          var actionOrder = b.initiative - a.initiative; //highest initiative first
-
-          var result = passOrder + actionOrder;
-
-          //if there is no initiative left, always return last
-          if (b.initiative == 0) {
-              result = -99999999999999;
-          }
-
-          if (a.initiative == 0) {
-              result = 99999999999999;
-          }
+          //then order by 0 initiatives. 0 must always be first
+          if (a.initiative == 0) { return 1; }
+          if (b.initiative == 0) { return -1; }
           
-          return result;
+          //now order by pass. those behind on passes should be first
+          if (a.pass > b.pass) { return 1; }
+          if (a.pass < b.pass) { return -1; }
+
+          //finally order by initiative, order from highest to lowest
+          if (a.initiative > b.initiative) { return -1; }
+          if (a.initiative < b.initiative) { return 1; }
+
+          return 0;
+
       });
 
       return characters;
   },
 
+  takeTurn: function (character, newInitiativeScore, isNewCombat) {
+
+      //events don't take passes or turns
+      if (character.isEvent) {
+          return character;
+      }
+
+      character.initiative = parseInt(newInitiativeScore);
+      character.pass = 1;
+      if (isNewCombat) {
+          character.turn = 1;
+      } else {
+          character.turn++;    
+      }
+      
+      return character;
+  },
+
   takePass: function (character) {
 
+      //events don't take passes or turns
+      if (character.isEvent) {
+          character.initiative = 0;
+          return character;
+      }
+      
       var passCost = 10;
       
       //lower bound of 0 initiative
@@ -51,6 +113,8 @@ angular.module('starter.services', [])
           character.initiative = parseInt(character.initiative) - 10;
           character.pass++;
       }
+
+      character.effects = [];
       
       return character;
   },
@@ -65,6 +129,11 @@ angular.module('starter.services', [])
       if (character.initiative < 0) {
           character.initiative = 0;
       }
+
+      //persist if required
+      if (interupt.persist) {
+          character.effects.push(interupt.name);
+      }
       
       return character;
   }
@@ -73,7 +142,16 @@ angular.module('starter.services', [])
 } ])
 
 
+.factory('characterOptionsService', [function() {
+    
+    return{
+        
 
+
+
+    };
+
+}])
 
 
 ;

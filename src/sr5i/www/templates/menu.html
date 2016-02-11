@@ -1,4 +1,4 @@
-﻿<ion-side-menus enable-menu-with-back-views="true" enable-back-views="false">
+﻿<ion-side-menus enable-menu-with-back-views="false" enable-back-views="false">
     <ion-side-menu-content drag-content="false">
         <ion-nav-bar class="bar-stable">
             <ion-nav-back-button>
@@ -17,8 +17,8 @@
             <ion-content>
                 <ion-list>
                    
-                    <ion-item menu-close nav-clear ng-click="rollInitiative()">
-                        Roll Initiative
+                    <ion-item menu-close nav-clear ng-click="rollInitiative(true)">
+                        New Combat
                     </ion-item>
                     
                     <ion-item menu-close nav-clear ng-click="addCharacter()" >

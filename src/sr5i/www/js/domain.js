@@ -44,8 +44,8 @@ angular.module('starter.domain', [])
 .factory('domain$Character', ['db', function (db) {
 
     var table = 'character';
-    
-    var columns = ['name', 'initiative', 'pass'];
+
+    var columns = ['name', 'initiative', 'pass', 'turn', 'isEvent', 'effects'];
 
     return domain(db, table, columns);
 

@@ -1,0 +1,54 @@
+<ion-view view-title="Edit {{character.name}}">
+  <ion-content class="padding" irl-swipe-back>
+    
+    
+      
+      <div class="list">
+        
+          <label class="item item-input">
+              <input type="text" placeholder="Name" ng-model="character.name"  required>
+          </label>
+        
+          <div class="item item-input-inset" >
+              <label class="item-input-wrapper">
+                  Initiative: <input type="text" ng-model="character.initiative">
+              </label>
+          </div>
+          
+          <div class="item item-input-inset" >
+              <label class="item-input-wrapper">
+                  Pass: <input type="text" ng-model="character.pass">
+              </label>
+          </div>
+          
+          <div class="item item-input-inset" >
+              <label class="item-input-wrapper">
+                  Turn: <input type="text" ng-model="character.turn">
+              </label>
+          </div>
+          
+          <div class="item item-toggle">
+                  Is Event
+                  <label class="toggle">
+                      <input type="checkbox" ng-model="character.isEvent">
+                      <div class="track">
+                          <div class="handle"></div>
+                      </div>
+                  </label>
+          
+           </div>
+          
+          <button class="button button-positive button-full" ng-click="update(character)">Update</button>     
+          
+      </div>
+      
+      <b>Notes</b><br/>
+      <small>
+          Current Initiative: {{currentInitiative}} <br/>
+          Current Pass: {{currentPass}} <br/>
+          Current Turn: {{currentTurn}} <br/>
+          Grenades would explode on initiative {{currentInitiative-10 >0 ? currentInitiative-10:1}} <b>next</b> turn <br/>
+      </small>
+    
+  </ion-content>
+</ion-view>
