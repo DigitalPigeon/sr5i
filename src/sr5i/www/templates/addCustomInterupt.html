@@ -1,0 +1,34 @@
+<ion-view view-title="Custom Interupt for {{character.name}}">
+  <ion-content class="padding" irl-swipe-back>
+    
+      
+      <div class="list">
+        
+          <label class="item item-input">
+              <input type="text" placeholder="Interupt Name" ng-model="interupt.name"  required>
+          </label>
+        
+          <div class="item item-input-inset" >
+              <label class="item-input-wrapper">
+                  Initiative Penalty: <input type="text" ng-model="interupt.initiative">
+              </label>
+          </div>
+          
+          <div class="item item-toggle">
+                  Persists?
+                  <label class="toggle">
+                      <input type="checkbox" ng-model="interupt.persist">
+                      <div class="track">
+                          <div class="handle"></div>
+                      </div>
+                  </label>
+          
+           </div>
+          
+          
+          <button class="button button-positive button-full" ng-click="apply(character, interupt)">Apply</button>     
+          
+      </div>
+      
+  </ion-content>
+</ion-view>

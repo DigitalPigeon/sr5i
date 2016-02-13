@@ -3,7 +3,7 @@
 <widget xmlns="http://www.w3.org/ns/widgets" 
         xmlns:gap="http://phonegap.com/ns/1.0"
         id="com.irlinnovations.sr5initiative" 
-        version="1.0.0" >
+        version="1.0.1" >
   
     <name>SR5 Initiative Tracker</name>
     
@@ -34,7 +34,6 @@
   <icon src="icon.png" />
   
   <gap:platform name="android" />
-  <gap:platform name="ios" />
   
   <!--
     <gap:platform name="ios" />

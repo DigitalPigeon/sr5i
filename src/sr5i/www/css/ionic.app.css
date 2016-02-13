@@ -9731,6 +9731,10 @@ a.button {
   -webkit-transition-duration: 0s;
   transition-duration: 0s; }
 
+.event-list-item {
+  background-colorx: #ffc900;
+  background-color: red; }
+
 .checkbox input, .checkbox-icon {
   display: inline-block;
   vertical-align: middle; }

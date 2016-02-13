@@ -12,7 +12,7 @@
       
       <button class="button button-balanced button-full" type="button" ng-click="rollInitiative()" ng-if="actingCharacter() == null" >Roll Initiative!</button>     
       
-      <div class="list" >
+      <ion-list class="list" >
           
           <div class="item item-icon-right list-divider row-no-top-border row-no-side-border" style="padding-bottom:10px;" ng-click="addCharacter()" >
               <b>Initiative Order</b>
@@ -22,18 +22,28 @@
           </div>
           <!--ng-click="showInfoPage(category.infoPageState); $event.stopPropagation();"-->
 
-          <div ng-repeat="character in characters" class="item item-icon-right  row-no-side-border" style="padding-bottom:10px;" ng-click="showCharacterOptions(character)">
-              {{character.name}} <small>({{character.initiative || '-'}}, Pass {{character.pass}}, Turn: {{character.turn}}) </small>              
-              <div ng-repeat="effect in character.effects" style="font-size: x-small; font-style: italic;">
-                  {{effect}}
-              </div>
-
-              <a >
+          <ion-item ng-repeat="character in characters" can-swipe="true" class="item row-no-side-border" ng-click="showCharacterOptions(character)">
+              
+              <span class="item-icon-left" ng-show="character.isEvent">
+                  <i class="icon ion-clock icon-smaller"></i>
+              </span>
+              
+              <span ng-style="getStyleIfCharacterIsInactiveThisPass(character)">
+                  {{character.name}} <small>({{character.initiative || '-'}}, Pass {{character.pass}}{{character.turn>0?' Next Turn':''}}) </small>              
+              
+                  <div ng-repeat="effect in character.effects" style="font-size: x-small; font-style: italic;">{{effect}}</div>
+              </span>
+              
+              <ion-option-button class="button-positive" ng-click="setInitiative(character)">Change</ion-option-button>
+              <ion-option-button class="button-assertive" ng-click="deleteCharacter(character)">Delete</ion-option-button>
+              
+              <a class="item-icon-right" style="padding:0px;">
                   <i class="icon ion-more icon-smaller"></i>
               </a>
-          </div>
 
-      </div>
+          </ion-item>
+
+      </ion-list>
 
   </ion-content>
 </ion-view>

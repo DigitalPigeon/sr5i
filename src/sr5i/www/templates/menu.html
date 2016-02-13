@@ -17,11 +17,11 @@
             <ion-content>
                 <ion-list>
                    
-                    <ion-item menu-close nav-clear ng-click="rollInitiative(true)">
+                    <ion-item menu-close nav-clear ng-click="menuEvent('newCombat')">
                         New Combat
                     </ion-item>
                     
-                    <ion-item menu-close nav-clear ng-click="addCharacter()" >
+                    <ion-item menu-close nav-clear ng-click="menuEvent('addSomething')" >
                         Add Something
                     </ion-item>
                     
@@ -29,11 +29,7 @@
                         Clear Everything
                     </ion-item>
 
-                    <ion-item class=" list-divider"></ion-item>
                     
-                    <ion-item menu-close ng-click="show('app.welcome')">
-                        About
-                    </ion-item>
                 </ion-list>
             </ion-content>            
         </ion-side-menu>

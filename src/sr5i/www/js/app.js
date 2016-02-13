@@ -80,6 +80,18 @@ angular.module('starter', ['ionic', 'starter.db', 'starter.domain', 'starter.con
                 }
             }
         })
+
+        .state('app.addCustomInterupt', {
+            url: '/addCustomInterupt/:characterId',
+            views: {
+                'main': {
+                    templateUrl: 'templates/addCustomInterupt.html',
+                    controller: 'AddCustomInteruptController'
+                }
+            }
+        })
+
+        
         
         ;
 

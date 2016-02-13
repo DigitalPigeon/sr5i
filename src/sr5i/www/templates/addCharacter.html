@@ -11,32 +11,10 @@
         
           <div class="item item-input-inset" >
               <label class="item-input-wrapper">
-                  <input type="text" placeholder="Initiative (optional)" ng-model="character.initiative">
+                  <input type="number" placeholder="Initiative (optional)" ng-model="character.initiative">
               </label>
           </div>
-          <!--
-              <div class="item item-toggle">
-                  One Time Event <b>This</b> Pass
-                  <label class="toggle">
-                      <input type="checkbox" ng-model="character.eventThisPass">
-                      <div class="track">
-                          <div class="handle"></div>
-                      </div>
-                  </label>
-          
-              </div>
-        
-              <div class="item item-toggle">
-                  One Time Event <b>Next</b> Pass
-                  <label class="toggle">
-                      <input type="checkbox" ng-model="character.eventNextPass">
-                      <div class="track">
-                          <div class="handle"></div>
-                      </div>
-                  </label>
-          
-              </div>
-              -->
+         
           <button class="button button-positive button-full" ng-click="create()">Add Character</button>     
               
           <div style="text-align: center;">
@@ -46,13 +24,13 @@
           
           <div class="row">
               <div class="col">
-                  <button class="button button-royal button-full" ng-click="create({turn:0, pass:0})">This Pass</button>     
+                  <button class="button button-royal button-full" ng-click="create({delayTurn:0, pass:0})">This Pass</button>     
               </div>
               <div class="col">
-                  <button class="button button-royal button-full" ng-click="create({turn:0, pass:1})">Next Pass</button>
+                  <button class="button button-royal button-full" ng-click="create({delayTurn:0, pass:1})">Next Pass</button>
               </div>
               <div class="col">
-                  <button class="button button-dark button-full" ng-click="create({turn:1, pass:0})">Next Turn</button>     
+                  <button class="button button-dark button-full" ng-click="create({delayTurn:1, pass:0})">Next Turn</button>     
               </div>
         </div>
 
@@ -68,7 +46,6 @@
       <small>
           Current Initiative: {{currentInitiative}} <br/>
           Current Pass: {{currentPass}} <br/>
-          Current Turn: {{currentTurn}} <br/>
           Grenades would explode on initiative {{currentInitiative-10 >0 ? currentInitiative-10:1}} <b>next</b> turn <br/>
       </small>
     

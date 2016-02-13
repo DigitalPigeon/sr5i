@@ -36,19 +36,7 @@ angular.module('starter.services', [])
           return 1;
       }
   },
-
-  currentTurn: function (characters) {
-
-      characters = characters || domain$Character.retrieveAll();
-      characters = this.charactersInActionOrder(characters);
-
-      if (characters.length > 0) {
-          return characters[0].turn;
-      } else {
-          return 1;
-      }
-  },
-
+  
   charactersInActionOrder: function(characters) {
 
       characters = characters || domain$Character.retrieveAll();
@@ -71,6 +59,10 @@ angular.module('starter.services', [])
           if (a.initiative > b.initiative) { return -1; }
           if (a.initiative < b.initiative) { return 1; }
 
+          //for consistancy, alphabetical sort ties
+          if (a.name > b.name) { return 1; }
+          if (a.name < b.name) { return -1; }
+
           return 0;
 
       });
@@ -80,17 +72,18 @@ angular.module('starter.services', [])
 
   takeTurn: function (character, newInitiativeScore, isNewCombat) {
 
-      //events don't take passes or turns
-      if (character.isEvent) {
-          return character;
-      }
-
-      character.initiative = parseInt(newInitiativeScore);
-      character.pass = 1;
-      if (isNewCombat) {
-          character.turn = 1;
+      //if its on a turn delay, then count down the delay
+      if (character.turn > 0) {
+          character.turn--;
+          console.log(character.name + '.turn: ' + character.turn);
       } else {
-          character.turn++;    
+          
+          //if an initiative was supplied, use it
+          if (newInitiativeScore != undefined) {
+              character.initiative = parseInt(newInitiativeScore);
+          }
+
+          character.pass = 1;
       }
       
       return character;
@@ -98,9 +91,8 @@ angular.module('starter.services', [])
 
   takePass: function (character) {
 
-      //events don't take passes or turns
+      //events don't take passes
       if (character.isEvent) {
-          character.initiative = 0;
           return character;
       }
       
@@ -132,6 +124,13 @@ angular.module('starter.services', [])
 
       //persist if required
       if (interupt.persist) {
+
+          //only persist if they don't already have this
+          for (var count = 0; count < character.effects.length; count++) {
+            if (character.effects[count] == interupt.name) {
+                return character;
+            }
+          }
           character.effects.push(interupt.name);
       }
       
@@ -145,10 +144,6 @@ angular.module('starter.services', [])
 .factory('characterOptionsService', [function() {
     
     return{
-        
-
-
-
     };
 
 }])
