@@ -111,10 +111,10 @@ angular.module('starter.services', [])
       return character;
   },
 
-  applyInterupt: function (character, interupt) {
+  applyInterrupt: function (character, interrupt) {
 
-      if (interupt.initiative || interupt.initiative == 0) {
-          character.initiative = parseInt(interupt.initiative) + parseInt(character.initiative);
+      if (interrupt.initiative || interrupt.initiative == 0) {
+          character.initiative = parseInt(interrupt.initiative) + parseInt(character.initiative);
       }
 
       //lower bound of 0 initiative
@@ -123,15 +123,15 @@ angular.module('starter.services', [])
       }
 
       //persist if required
-      if (interupt.persist) {
+      if (interrupt.persist) {
 
           //only persist if they don't already have this
           for (var count = 0; count < character.effects.length; count++) {
-            if (character.effects[count] == interupt.name) {
+            if (character.effects[count] == interrupt.name) {
                 return character;
             }
           }
-          character.effects.push(interupt.name);
+          character.effects.push(interrupt.name);
       }
       
       return character;

@@ -3,6 +3,7 @@ angular.module('starter.controllers', [])
 
     .controller('AppController', function ($rootScope, $scope, $state, $ionicPopup, $ionicHistory, db, domain$Character, initiativeManagerService) {
 
+    
         $scope.goBack = function() {
             $rootScope.$ionicGoBack();        
         };
@@ -20,14 +21,29 @@ angular.module('starter.controllers', [])
             $state.go('app.tracker', null, { reload: true });    
         };
 
-        $scope.clearEverything = function() {
-            $ionicPopup.confirm({ title: 'Clear everything?', subTitle: 'This cannot be undone.' })
+        $scope.clearDatabase = function() {
+            $ionicPopup.confirm({ title: 'Reset the database?', subTitle: 'This will remove all custom saved data. This cannot be undone.' })
                 .then(function (result) {
                     if (result) {
                         db.reset();
                         $scope.reloadHome();    
                     }
                 });
+        };
+
+        $scope.clearInitiaitveTrack = function () {
+            $ionicPopup.confirm({ title: 'Clear the initiative track?', subTitle: 'This cannot be undone.' })
+            .then(function (result) {
+                if (result) {
+                    var characters = domain$Character.retrieveAll();
+
+                    for (var index = 0; index < characters.length; index++) {
+                        domain$Character.del(characters[index].id);
+                    }
+
+                    $scope.reloadHome();    
+                }
+            });
         };
 
         $scope.menuEvent = function(eventName, eventParams) {
@@ -40,6 +56,7 @@ angular.module('starter.controllers', [])
 
         var rebind = function() {
             $scope.characters = initiativeManagerService.charactersInActionOrder(domain$Character.retrieveAll());
+            $ionicListDelegate.closeOptionButtons();
         };
 
         $scope.$on('$ionicView.enter', function() {
@@ -58,6 +75,26 @@ angular.module('starter.controllers', [])
             $state.go('app.addCharacter');
         };
 
+        $scope.quickAddCharacter = function () {
+
+            $ionicPopup.prompt({ title: 'Character Name?', inputType: 'text', templateUrl: 'templates/common/fixedPromptText.html' })
+                            .then(function (result) {
+                                if (result) {
+
+                                    var pass = initiativeManagerService.currentPass();
+                                    
+                                    domain$Character.persist({ name: result,
+                                        initiative: 0, pass: pass, turn: 0,
+                                        isEvent: false,
+                                        effects: []
+                                    });
+                                    rebind();
+                                    $scope.quickAddCharacter();
+                                }
+                            });
+
+        };
+
         $scope.getStyleIfCharacterIsInactiveThisPass = function (character) {
             var currentPass = initiativeManagerService.currentPass();
             
@@ -71,51 +108,55 @@ angular.module('starter.controllers', [])
         };
 
         $scope.rollInitiative = function (isNewCombat) {
-            var characters = domain$Character.retrieveAll();
+            
+            var deferred = $q.defer();
 
-            var rollAll = function () {
+            var rollAll = function (characterList, index) {
+                
+                //if we have completely recursed
+                if (index >= characterList.length) {
+                    deferred.resolve('Completed');
+                } 
+                //recursing still exists
+                else {
 
-                var deferred = $q.defer();
-                var rolledCount = 0;
+                    var character = characterList[index];
 
-                angular.forEach(characters, function (character) {
+                    deferred.notify(character.name);
 
                     if (!character.isEvent) {
-                        $ionicPopup.prompt({ title: character.name + "'s" + ' initiative?' })
-                            .then(function (result) {
-                                deferred.notify(character.name);
+                        $ionicPopup.prompt({ title: character.name + "'s" + ' initiative?', inputType: 'number', templateUrl:'templates/common/fixedPrompt.html' })
+                            .then(function(result) {
                                 if (result) {
                                     character = initiativeManagerService.takeTurn(character, result, isNewCombat);
                                     domain$Character.persist(character);
-                                }
-
-                                rolledCount++;
-                                if (rolledCount == characters.length) {
-                                    deferred.resolve(rolledCount);
+                                    rollAll(characterList, index + 1);
+                                } else {
+                                    deferred.resolve('Canceled by user');
+                                    //deferred.reject('Canceled by user');
                                 }
                             });
                     }
                     //deal with the event
                     else {
-                        rolledCount++;
-                        
+
                         if (!isNewCombat) {
                             character = initiativeManagerService.takeTurn(character);
                             domain$Character.persist(character);
                         } else {
                             domain$Character.del(character.id);
                         }
-                        
-                        if (rolledCount == characters.length) {
-                            deferred.resolve(rolledCount);
-                        }
-                    }
-                });
 
-                return deferred.promise;
+                        rollAll(characterList, index + 1);
+                    }
+
+                    if (index == 0) {
+                        return deferred.promise;
+                    }
+                }
             };
 
-            rollAll()
+            rollAll(domain$Character.retrieveAll(), 0)
             .then(function (result) {
                 rebind();
             });
@@ -136,9 +177,16 @@ angular.module('starter.controllers', [])
         
         $scope.setInitiative = function (character) {
 
-            $ionicPopup.prompt({ title: 'New initiative score for ' + character.name + '?', defaultText: character.initiative, inputType: 'number' })
+            $ionicPopup.prompt({ title: 'New initiative score for ' + character.name + '?', defaultText: character.initiative, inputType: 'number', templateUrl:'templates/common/fixedPrompt.html' })
             .then(function (result) {
                 if (result) {
+
+                    //if the character was out of initiative, then change his pass to be the current pass, otherwise
+                    //he would jump ahead of other characters
+                    if ( !character.isEvent && (character.initiative == 0 || result > 0)) {
+                        character.pass = initiativeManagerService.currentPass();
+                    }
+                    
                     character.initiative = result;
                     domain$Character.persist(character);
                     rebind();
@@ -162,17 +210,23 @@ angular.module('starter.controllers', [])
                 initiativeManagerService.takePass(actingCharacter);
                 domain$Character.persist(actingCharacter);
                 rebind();
-
             }
         };
 
     })
 
-    .controller('CharacterOptionsController', function ($rootScope, $scope, $state, $stateParams, $ionicPopup, domain$Character, initiativeManagerService) {
+    .controller('CharacterOptionsController', function ($rootScope, $scope, $state, $stateParams, $ionicPopup, $ionicListDelegate, 
+                                                            domain$Character, domain$Interrupt, initiativeManagerService) {
 
+        
+        var rebind = function() {
+            $scope.character = domain$Character.retrieve($stateParams.characterId);
+            $scope.customInterrupts = domain$Interrupt.retrieveAll();
+        }
 
         $scope.$on('$ionicView.enter', function() {
-            $scope.character = domain$Character.retrieve($stateParams.characterId);
+            rebind();
+            $ionicListDelegate.closeOptionButtons();
         });
         
         $scope.deleteCharacter = function (character) {
@@ -191,12 +245,30 @@ angular.module('starter.controllers', [])
             $state.go('app.editCharacter', {characterId: character.id});
         };
 
+        $scope.addInterrupt = function (character) {
+            $state.go('app.addCustomInterrupt', { characterId: character.id });
+            $ionicListDelegate.closeOptionButtons();
+        };
 
-        $scope.addInterupt = function (character, interupt) {
+        $scope.deleteCustomInterrupt = function (interrupt) {
 
-            if (interupt.initiative == undefined) {
+            $ionicPopup.confirm({ title: 'Delete ' + interrupt.name + '?', subTitle: 'This cannot be undone.' })
+                    .then(function (result) {
+                        if (result) {
+                            domain$Interrupt.del(interrupt.id);
+                            rebind();
+                        }
+                    });
 
-                $ionicPopup.prompt({ title: 'Initiative Cost?',  })
+            $ionicListDelegate.closeOptionButtons();
+        };
+
+
+        $scope.quickAddInterrupt = function (character, interrupt) {
+
+            if (interrupt.initiative == undefined) {
+
+                $ionicPopup.prompt({ title: 'Initiative Cost?', inputType: 'number', templateUrl: 'templates/common/fixedPrompt.html' })
                             .then(function (result) {
                                 if (result) {
 
@@ -204,8 +276,8 @@ angular.module('starter.controllers', [])
                                         result = result * -1;
                                     }
 
-                                    interupt.initiative = result;
-                                    initiativeManagerService.applyInterupt(character, interupt);
+                                    interrupt.initiative = result;
+                                    initiativeManagerService.applyInterrupt(character, interrupt);
                                     domain$Character.persist(character);
                                     $rootScope.$ionicGoBack();
                                 }
@@ -214,7 +286,7 @@ angular.module('starter.controllers', [])
             }
             else
             {
-                initiativeManagerService.applyInterupt(character, interupt);
+                initiativeManagerService.applyInterrupt(character, interrupt);
                 domain$Character.persist(character);
                 $rootScope.$ionicGoBack();
             }
@@ -273,7 +345,36 @@ angular.module('starter.controllers', [])
         }
 
     })
-        
+
+
+
+    .controller('AddCustomInterruptController', function ($scope, $stateParams, domain$Character, domain$Interrupt, initiativeManagerService) {
+
+        $scope.$on('$ionicView.enter', function () {
+
+            var characterId = $stateParams.characterId;
+            $scope.character = domain$Character.retrieve(characterId);
+            $scope.interrupt = { name: '', initiative: null, persist: false };
+        });
+
+        $scope.applyAndSave = function () {
+
+            $scope.interrupt.initiative = ($scope.interrupt.initiative > 0)
+                ? $scope.interrupt.initiative = $scope.interrupt.initiative * -1
+                : $scope.interrupt.initiative;
+
+            if ($scope.interrupt.name && ($scope.interrupt.initiative || $scope.interrupt.initiative == 0))
+            {
+                initiativeManagerService.applyInterrupt($scope.character, $scope.interrupt);
+                domain$Character.persist($scope.character);
+
+                domain$Interrupt.persist($scope.interrupt);
+
+                $scope.reloadHome();
+
+            }
+        }
+    })
 
 ;
 

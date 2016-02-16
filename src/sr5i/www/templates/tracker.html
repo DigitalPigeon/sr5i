@@ -14,7 +14,8 @@
       
       <ion-list class="list" >
           
-          <div class="item item-icon-right list-divider row-no-top-border row-no-side-border" style="padding-bottom:10px;" ng-click="addCharacter()" >
+          <div class="item item-icon-right list-divider row-no-top-border row-no-side-border" style="padding-bottom:10px;" 
+                        ng-click="addCharacter()" on-hold="quickAddCharacter()" >
               <b>Initiative Order</b>
               <a >
                   <i class="icon ion-plus positive icon-smaller"></i>
@@ -22,7 +23,10 @@
           </div>
           <!--ng-click="showInfoPage(category.infoPageState); $event.stopPropagation();"-->
 
-          <ion-item ng-repeat="character in characters" can-swipe="true" class="item row-no-side-border" ng-click="showCharacterOptions(character)">
+          <ion-item ng-repeat="character in characters" can-swipe="true" class="item row-no-side-border" 
+                    ng-click="showCharacterOptions(character)"
+                    on-hold="setInitiative(character)"
+                    >
               
               <span class="item-icon-left" ng-show="character.isEvent">
                   <i class="icon ion-clock icon-smaller"></i>

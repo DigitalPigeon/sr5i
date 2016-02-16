@@ -52,4 +52,16 @@ angular.module('starter.domain', [])
     }])
 
 
+.factory('domain$Interrupt', ['db', function (db) {
+
+    var table = 'interrupt';
+
+    var columns = ['name', 'initiative', 'persist'];
+
+    return domain(db, table, columns);
+
+} ])
+
 ;
+
+

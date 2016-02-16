@@ -1,16 +1,34 @@
 <ion-view view-title="{{character.name}}'s Options">
   <ion-content class="padding" irl-swipe-back>
   
-    <div ng-show="!character.isEvent && character.initiative">
-        <a class="button button-positive button-full" type="button" ng-click="addInterupt(character, {name: 'Full Defence', initiative:-10, persist: true})" >Full Defense (-10)</a>     
-        <a class="button button-positive button-full" type="button" ng-click="addInterupt(character, {name: 'Dodge / Parry / Block', initiative:-5, persist: false})" >Dodge / Parry / Block (-5)</a> 
-    <a class="button button-positive button-full" type="button" ng-click="addInterupt(character, {name: 'Counterspell', initiative:-5, persist: true})">Counterspell (-5)</a> 
-    <a class="button button-positive button-full" type="button" ng-click="addInterupt(character, {name: 'Other', persist:false})">Other (-?)</a> 
-      <hr />
-      </div>
-      <a class="button button-calm button-full" type="button" ng-click="editCharacter(character)" >Edit</a>     
+      <ion-list class="list" ng-show="!character.isEvent && character.initiative">
+          <ion-item class="item text-center" type="button" ng-click="quickAddInterrupt(character, {name: 'Full Defence', initiative:-10, persist: true})" >Full Defence (-10)</ion-item>     
+          <ion-item class="item  text-center" type="button" ng-click="quickAddInterrupt(character, {name: 'Dodge / Parry / Block', initiative:-5, persist: false})" >Dodge / Parry / Block (-5)</ion-item> 
+          <ion-item class="item  text-center" type="button" ng-click="quickAddInterrupt(character, {name: 'Counterspell', initiative:-5, persist: true})">Counterspell (-5)</ion-item> 
+          
+          
+          <ion-item ng-repeat="customInterrupt in customInterrupts" class="item  text-center" type="button" ng-click="quickAddInterrupt(character, customInterrupt)">{{customInterrupt.name}} ({{customInterrupt.initiative}})
+              
+              <div class="item-icon-left" style="padding:0px;">
+                  <i class="icon ion-ios-flask icon-smaller"></i>
+              </div>
+              
+              <ion-option-button class="button-assertive" ng-click="deleteCustomInterrupt(customInterrupt)">Delete</ion-option-button>
+              
+          </ion-item> 
+          
+          
+          <ion-item class="item  text-center" type="button" 
+                    ng-click="addInterrupt(character)"
+                    on-hold="quickAddInterrupt(character, {name: 'Other', persist:false})" 
+                    >Other
+          </ion-item> 
 
-      <a class="button button-assertive button-full" type="button" ng-click="deleteCharacter(character)" >Delete</a>     
+      </ion-list>
+      
+      <a class="button button-calm button-full" type="button" ng-click="editCharacter(character)" >Edit {{character.name}}</a>     
+
+      <a class="button button-assertive button-full" type="button" ng-click="deleteCharacter(character)" >Delete {{character.name}}</a>     
 
   </ion-content>
 </ion-view>

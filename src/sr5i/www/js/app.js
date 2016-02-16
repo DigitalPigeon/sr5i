@@ -81,12 +81,12 @@ angular.module('starter', ['ionic', 'starter.db', 'starter.domain', 'starter.con
             }
         })
 
-        .state('app.addCustomInterupt', {
-            url: '/addCustomInterupt/:characterId',
+        .state('app.addCustomInterrupt', {
+            url: '/addCustomInterrupt/:characterId',
             views: {
                 'main': {
-                    templateUrl: 'templates/addCustomInterupt.html',
-                    controller: 'AddCustomInteruptController'
+                    templateUrl: 'templates/addCustomInterrupt.html',
+                    controller: 'AddCustomInterruptController'
                 }
             }
         })
