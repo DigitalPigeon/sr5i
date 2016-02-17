@@ -19,8 +19,8 @@
           
           
           <ion-item class="item  text-center" type="button" 
-                    ng-click="addInterrupt(character); $event.stopPropagation();"
-                    on-hold="quickAddInterrupt(character, {name: 'Other', persist:false}); $event.stopPropagation();" 
+                    on-tap="addInterrupt(character); "
+                    on-hold="quickAddInterrupt(character, {name: 'Other', persist:false});" 
                     >Other
           </ion-item> 
 

@@ -24,8 +24,8 @@
           <!--ng-click="showInfoPage(category.infoPageState); $event.stopPropagation();"-->
 
           <ion-item ng-repeat="character in characters" can-swipe="true" class="item row-no-side-border" 
-                    ng-click="showCharacterOptions(character); $event.stopPropagation();"
-                    on-hold="setInitiative(character); $event.stopPropagation();"
+                    on-tap="showCharacterOptions(character); "
+                    on-hold="setInitiative(character); "
                     >
               
               <span class="item-icon-left" ng-show="character.isEvent">
