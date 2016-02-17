@@ -2,8 +2,8 @@
 
 <widget xmlns="http://www.w3.org/ns/widgets" 
         xmlns:gap="http://phonegap.com/ns/1.0"
-        id="com.irlinnovations.sr5initiativepaid" 
-        version="1.0.0" >
+        id="com.irlinnovations.sr5initiative" 
+        version="1.1.0" >
   
     <name>SR5 Initiative Tracker</name>
     
