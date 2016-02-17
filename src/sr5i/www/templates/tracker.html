@@ -15,7 +15,8 @@
       <ion-list class="list" >
           
           <div class="item item-icon-right list-divider row-no-top-border row-no-side-border" style="padding-bottom:10px;" 
-                        ng-click="addCharacter()" on-hold="quickAddCharacter()" >
+               on-tap="addCharacter()" 
+               on-swipe="quickAddCharacter()" >
               <b>Initiative Order</b>
               <a >
                   <i class="icon ion-plus positive icon-smaller"></i>
@@ -25,7 +26,6 @@
 
           <ion-item ng-repeat="character in characters" can-swipe="true" class="item row-no-side-border" 
                     on-tap="showCharacterOptions(character); "
-                    on-hold="setInitiative(character); "
                     >
               
               <span class="item-icon-left" ng-show="character.isEvent">
