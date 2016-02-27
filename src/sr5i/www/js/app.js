@@ -20,6 +20,15 @@ angular.module('starter', ['ionic', 'starter.db', 'starter.domain', 'starter.con
       // org.apache.cordova.statusbar required
       StatusBar.styleDefault();
     }
+    
+
+    //nl.xservices.plugins.Insomnia required
+    //https://github.com/EddyVerbruggen/Insomnia-PhoneGap-Plugin
+    //https://github.com/EddyVerbruggen/Insomnia-PhoneGap-Plugin.git
+    if(window.plugins && window.plugins.insomnia)
+    {
+        window.plugins.insomnia.keepAwake();
+    }
   });
 })
 

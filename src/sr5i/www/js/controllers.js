@@ -233,8 +233,7 @@ angular.module('starter.controllers', [])
                 for (var count = 0; count < characters.length; count++)
                 {
                     if (characters[count])
-                    {
-                        console.log('save ' + characters[count].name);
+                    {                        
                         domain$Character.persist(characters[count]);
                     }
                 }                
