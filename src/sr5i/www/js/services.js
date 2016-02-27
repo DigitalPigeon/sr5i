@@ -8,7 +8,33 @@ angular.module('starter.services', [])
       characters = characters || domain$Character.retrieveAll();
       characters = this.charactersInActionOrder(characters);
       if (characters.length > 0 && characters[0].initiative > 0) {
-          return this.charactersInActionOrder(characters)[0];
+          //return this.charactersInActionOrder(characters)[0];
+          return characters[0]
+      }
+      return null;
+  },
+
+  nextActingCharacter: function (actingCharacter, characters) {
+      
+      characters = characters || domain$Character.retrieveAll();
+      characters = this.charactersInActionOrder(characters);
+      if (characters.length > 0 && characters[0].initiative > 0) {
+          
+          var foundActingCharacter = false;
+          for (var count = 0; count < characters.length; count++)
+          {
+              //found the acting character last time, so this must be the next acting character
+              if (foundActingCharacter)
+              {
+                  return characters[count];
+              }
+
+              if (characters[count].id == actingCharacter.id)
+              {                  
+                  foundActingCharacter = true;
+              }
+          }
+
       }
       return null;
   },
@@ -95,6 +121,8 @@ angular.module('starter.services', [])
       if (character.isEvent) {
           return character;
       }
+
+      var nextActingCharacter = this.nextActingCharacter(character);
       
       var passCost = 10;
       
@@ -106,9 +134,12 @@ angular.module('starter.services', [])
           character.pass++;
       }
 
-      character.effects = [];
+      if (nextActingCharacter)
+      {
+          nextActingCharacter.effects = [];
+      }      
       
-      return character;
+      return [character, nextActingCharacter];
   },
 
   applyInterrupt: function (character, interrupt) {

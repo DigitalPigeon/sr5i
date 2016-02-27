@@ -6,7 +6,7 @@
 -->
 <ion-view view-title="SR5 Intitiative Tracker" disable-back-button="true">
   <ion-content class="padding">
-    
+            
       
       <button class="button button-positive button-full" type="button" ng-click="activeCharacterTakesPass()" ng-if="actingCharacter() != null">Next!</button>     
       
@@ -14,36 +14,45 @@
       
       <ion-list class="list" >
           
-          <div class="item item-icon-right list-divider row-no-top-border row-no-side-border" style="padding-bottom:10px;" 
-               on-tap="addCharacter()" 
-               on-swipe="quickAddCharacter()" >
-              <b>Initiative Order</b>
-              <a >
-                  <i class="icon ion-plus positive icon-smaller"></i>
+          <ion-item class="item item-icon-right list-divider row-no-top-border row-no-side-border" style="padding-bottom:10px;"
+               on-hold="addCharacter()"
+               on-tap="quickAddCharacter()">
+              <b>Initiative Order</b><br/>              
+              <a>
+                  <i class="icon ion-plus positive icon-smaller"></i>                  
               </a>
-          </div>
+          </ion-item>
           <!--ng-click="showInfoPage(category.infoPageState); $event.stopPropagation();"-->
 
-          <ion-item ng-repeat="character in characters" can-swipe="true" class="item row-no-side-border" 
-                    on-tap="showCharacterOptions(character); "
+          <ion-item ng-repeat="character in characters" can-swipe="true" class="item row-no-side-border item-button-right"
+                    on-tap-old="setInitiative(character)" on-tap="showCharacterOptions(character);"
                     >
-              
-              <span class="item-icon-left" ng-show="character.isEvent">
-                  <i class="icon ion-clock icon-smaller"></i>
+
+              <span class=" item-icon-left" ng-show="character.isEvent">
+              <i class="icon ion-clock icon-smaller"></i>
               </span>
-              
+
               <span ng-style="getStyleIfCharacterIsInactiveThisPass(character)">
-                  {{character.name}} <small>({{character.initiative || '-'}}, Pass {{character.pass}}{{character.turn>0?' Next Turn':''}}) </small>              
-              
+                  {{character.name}} <small>({{character.initiative || '-'}}, Pass {{character.pass}}{{character.turn>0?' Next Turn':''}}) </small>
+
                   <div ng-repeat="effect in character.effects" style="font-size: x-small; font-style: italic;">{{effect}}</div>
               </span>
-              
-              <ion-option-button class="button-positive" ng-click="setInitiative(character)">Change</ion-option-button>
-              <ion-option-button class="button-assertive" ng-click="deleteCharacter(character)">Delete</ion-option-button>
-              
-              <a class="item-icon-right" style="padding:0px;">
-                  <i class="icon ion-more icon-smaller"></i>
-              </a>
+
+              <div class="buttons">
+                  <button class="button button-calm" on-tap="addInitiative(character, -1); $event.stopPropagation();">
+                      <i class="icon ion-minus "></i>
+                  </button>
+
+                  <button class="button button-calm" on-tap="addInitiative(character, 1); $event.stopPropagation();">
+                      <i class="icon ion-plus"></i>
+                  </button>
+              </div>
+
+
+              <ion-option-button class="button-positive" on-tap="showCharacterOptions(character); $event.stopPropagation();">Advanced</ion-option-button>
+              <ion-option-button class="button-assertive" on-tap="deleteCharacter(character); $event.stopPropagation();">Delete</ion-option-button>
+
+
 
           </ion-item>
 

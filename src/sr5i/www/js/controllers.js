@@ -52,12 +52,13 @@ angular.module('starter.controllers', [])
 
     })
 
-    .controller('TrackerController', function ($scope, $state, $q, $ionicPopup, $ionicListDelegate, domain$Character, initiativeManagerService) {
+    .controller('TrackerController', function ($scope, $state, $q, $timeout, $ionicPopup, $ionicModal, $ionicListDelegate, domain$Character, initiativeManagerService) {
 
         var rebind = function() {
             $scope.characters = initiativeManagerService.charactersInActionOrder(domain$Character.retrieveAll());
             $ionicListDelegate.closeOptionButtons();
         };
+
 
         $scope.$on('$ionicView.enter', function() {
             rebind();
@@ -75,9 +76,29 @@ angular.module('starter.controllers', [])
             $state.go('app.addCharacter');
         };
 
+        var pendingRefresh;
+
+        $scope.addInitiative = function (character, amount) {
+
+            character.initiative += amount;
+            if (character.initiative <0)
+            {
+                character.initiative = 0;
+            }
+            domain$Character.persist(character);
+
+            if (pendingRefresh)
+            {
+                $timeout.cancel(pendingRefresh);
+            }
+
+            pendingRefresh = $timeout(rebind, 1500);
+
+        };
+
         $scope.quickAddCharacter = function () {
 
-            $ionicPopup.prompt({ title: 'Character Name?', inputType: 'text', templateUrl: 'templates/common/fixedPromptText.html' })
+            $ionicPopup.prompt({ title: 'Quick Add', subTitle:'Add as many names as you like', inputType: 'text', templateUrl: 'templates/common/fixedPromptText.html' })
                             .then(function (result) {
                                 if (result) {
 
@@ -207,8 +228,16 @@ angular.module('starter.controllers', [])
                         rebind();
                     });
             } else {
-                initiativeManagerService.takePass(actingCharacter);
-                domain$Character.persist(actingCharacter);
+                characters = initiativeManagerService.takePass(actingCharacter);
+
+                for (var count = 0; count < characters.length; count++)
+                {
+                    if (characters[count])
+                    {
+                        console.log('save ' + characters[count].name);
+                        domain$Character.persist(characters[count]);
+                    }
+                }                
                 rebind();
             }
         };
